@@ -1,0 +1,1 @@
+This project uses Prometheus to monitor Kubernetes resources, and applications deployed in Kubernetes. It uses Helm to deploy Prometheus, sets up service monitors to pull metrics, creates alerts using PromQL, and uses Alertmanager to send fired alerts to Email and Slack.
