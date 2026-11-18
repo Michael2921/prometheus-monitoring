@@ -1,0 +1,30 @@
+#  All Mysql instances are down & Mysql has too many connections
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: mysql-rules
+  namespace: monitoring-ns
+  labels:
+    release: monitoring-release
+spec:
+  groups:
+  - name: mysql.rules
+    rules:
+    - alert: MysqlDown
+      expr: 'max(mysql_up) == 0'
+      for: 1m
+      labels:
+        severity: critical
+        namespace: monitoring-ns
+      annotations:
+        summary: MySQL down (instance {{ $labels.instance }})
+        description: "MySQL instance is down on {{ $labels.instance }}\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+    - alert: MysqlTooManyConnections(>80%)
+      expr: 'max_over_time(mysql_global_status_threads_connected[1m]) / mysql_global_variables_max_connections * 100 > 80 and mysql_global_variables_max_connections > 0'
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: MySQL too many connections (> 80%) (instance {{ $labels.instance }})
+        description: "More than 80% of MySQL connections are in use on {{ $labels.instance }}\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"

@@ -1,0 +1,10 @@
+controller:
+  metrics:
+    enabled: true
+    service:
+      enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: monitoring-ns
+      additionalLabels:
+        release: monitoring-release

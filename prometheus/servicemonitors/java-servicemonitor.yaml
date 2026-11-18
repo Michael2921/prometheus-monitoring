@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: java-app-servicemonitor
+  namespace: monitoring-ns
+  labels:
+      release: monitoring-release
+      monitoring: enabled
+spec:
+  endpoints:
+    - path: /
+      port: metrics
+  namespaceSelector:
+    matchNames:
+    - default
+  selector:
+    matchLabels:
+      monitoring: enabled
+

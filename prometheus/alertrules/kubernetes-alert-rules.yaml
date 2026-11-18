@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: statefulset-rules
+  namespace: monitoring-ns
+  labels:
+    release: monitoring-release
+spec:
+  groups:
+  - name: statefulset.rules
+    rules:
+    - alert: KubernetesStatefulsetDown
+      expr: 'kube_statefulset_replicas > 0 and kube_statefulset_replicas != kube_statefulset_status_replicas_ready and changes(kube_statefulset_status_replicas_updated[1m]) == 0'
+      for: 1m
+      labels:
+        severity: critical
+        namespace: monitoring-ns
+      annotations:
+        summary: Kubernetes StatefulSet down (instance {{ $labels.instance }})
+        description: "StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} went down\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"

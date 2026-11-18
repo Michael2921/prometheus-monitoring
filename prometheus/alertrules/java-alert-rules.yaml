@@ -1,0 +1,22 @@
+# Too many requests
+# Create rule for inprogress requests and use bash script to test
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: java-rules
+  namespace: monitoring-ns
+  labels:
+    release: monitoring-release
+spec:
+  groups:
+  - name: javaalert.rules
+    rules:
+    - alert: TooManyRequests
+      expr: 'increase(java_app_http_requests_total[10m]) > 10'
+      for: 1m
+      labels:
+        severity: critical
+        namespace: monitoring-ns
+      annotations:
+        summary: Too many requests on Java app (instance {{ $labels.instance }})
+        description: "Application in namespace {{ $labels.namespace }} with pod name {{ $labels.pod }} has too many requests"

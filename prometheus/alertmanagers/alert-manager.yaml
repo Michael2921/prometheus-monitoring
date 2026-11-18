@@ -1,0 +1,52 @@
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmanagerConfig
+metadata:
+  name: alertmanager-config
+  namespace: monitoring-ns
+spec:
+  route:
+    receiver: 'email'
+    repeatInterval: 5m
+    routes:
+
+    - matchers:
+      - name: alertname
+        value: NginxHighHttp4xxErrorRate
+      receiver: email
+
+    - matchers:
+      - name: alertname
+        value: KubernetesStatefulsetDown
+      receiver: email
+
+    - matchers:
+      - name: alertname
+        value: TooManyRequests
+      receiver: slack
+
+    - matchers:
+      - name: alertname
+        value: MysqlDown
+      receiver: slack
+
+    - matchers:
+      - name: alertname
+        value: 'MysqlTooManyConnections(>80%)'
+      receiver: slack
+
+  receivers:
+    - name: 'email'
+      emailConfigs:
+        - to: 'micsamkid500@gmail.com'
+          from: 'micsamkid500@gmail.com'
+          smarthost: 'smtp.gmail.com:587'
+          authUsername: "micsamkid500@gmail.com"
+          authPassword:
+            name: gmail-auth
+            key: password
+    - name: 'slack'
+      slackConfigs:
+        - apiURL:
+            name: slack-auth
+            key: webhook_url
+          channel: '#alertmanager-channel'

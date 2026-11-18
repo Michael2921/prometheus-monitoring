@@ -1,0 +1,21 @@
+# More than 5% of HTTP requests have status 4xxapiVersion: monitoring.coreos.com/v1
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: nginx-rules
+  namespace: monitoring-ns
+  labels:
+    release: monitoring-release
+spec:
+  groups:
+  - name: nginx.rules
+    rules:
+    - alert: NginxHighHttp4xxErrorRate
+      expr: 'sum(rate(nginx_ingress_controller_requests{status=~"^4.."}[5m])) / sum(rate(nginx_ingress_controller_requests[5m])) * 100 > 5 and sum(rate(nginx_ingress_controller_requests[5m])) > 0'
+      for: 1m
+      labels:
+        severity: critical
+        namespace: monitoring-ns
+      annotations:
+        summary: Nginx high HTTP 4xx error rate (instance {{ $labels.instance }})
+        description: "Too many HTTP requests with status 4xx (> 5%)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
